@@ -14,7 +14,7 @@ MaiD = Date
 MaiDjo = MaiD - 10
 
 ''megnyitni a drms riportot és hogy automatikusan találja meg a sorok számát
-Set wb = Workbooks.Open("D:\BoldizsárÁdám\Munka\Dokumentumok\DRMS\makro\DRMS_20180910.xlsx")
+Set wb = Workbooks.Open("D:\BoldizsárÁdám\Munka\Dokumentumok\DRMS\makro\DRMS_20180918.xlsx")
 LastRowSok = wb.Worksheets("Sheet").Cells(wb.Worksheets("Sheet").Rows.Count, "A").End(xlUp).Row
 LastRowKeves = Worksheets("halott").Cells(Worksheets("halott").Rows.Count, "A").End(xlUp).Row
 LastRowKerdeses = Worksheets("kérdeses").Cells(Worksheets("kérdeses").Rows.Count, "A").End(xlUp).Row
@@ -26,7 +26,7 @@ wb.Worksheets("Sheet").Cells(1, 12).Value = "CCD megjegyzes"
 wb.Worksheets("Sheet").Cells(1, 13).Value = "Halott-e"
 wb.Worksheets("Sheet").Cells(1, 14).Value = "'10napon belul-e"
 
-''halott vagy 10napon belüli gépek kitörlése
+''halott vagy 10napon belüli gépek megjelölése
 For i = 2 To LastRowSok
     For j = 2 To LastRowKeves
         wb.Worksheets("Sheet").Cells(i, 9).NumberFormat = "yyyy/mm/dd"
@@ -41,6 +41,8 @@ For i = 2 To LastRowSok
     Next
 Next
 
+
+
 ''kérdeses fülrõl megjegyzések,status,ts átadása
 For c = 2 To LastRowKerdeses
         For v = 2 To LastRowSok
@@ -54,31 +56,34 @@ For c = 2 To LastRowKerdeses
         Next
 Next
 
+
 ''halott fül megjegyzések tartalmazza a ccd-t
 For i = 2 To LastRowKeves
-    If Not IsEmpty(Worksheets("halott").Cells(i, 9)) Then
+    'If Not IsEmpty(Worksheets("halott").Cells(i, 9)) Then
         For j = 2 To LastRowSok
-            wb.Worksheets("Sheet").Cells(j, 10).Value = Worksheets("halott").Cells(i, 8)                'status
+                            'status
             If Worksheets("halott").Cells(i, 2) = wb.Worksheets("sheet").Cells(j, 2) Then
-                wb.Worksheets("Sheet").Cells(j, 11).Value = Worksheets("halott").Cells(i, 9)            'TS,komment
+                wb.Worksheets("Sheet").Cells(j, 10).Value = Worksheets("halott").Cells(i, 8)            'STATUS
+                'wb.Worksheets("Sheet").Cells(j, 11).Value = Worksheets("halott").Cells(i, 9)            'TS,komment
+                wb.Worksheets("Sheet").Cells(j, 11).Value = Worksheets("halott").Cells(i, 14) & " " & Worksheets("kérdeses").Cells(i, 12)
                 Cells(j, 1).EntireRow.Interior.Color = RGB(255, 0, 0)
                 Exit For
             End If
         Next
-    End If
+    'End If
 Next
 
 ''Torolni a halott gépeket és a 10napon belülieket
- For i = 2 To LastRowSok
-    If wb.Worksheets("sheet").Cells(i, 13).Value = "Halott" Then
-        Rows(i).EntireRow.Delete
-        i = i - 1                                   'mikor kitorli a sort akkor visszakellugornia hogy  nehogy kihagyon egyet
-    End If
-    If wb.Worksheets("sheet").Cells(i, 14).Value = "10napon belüli" Then
-        Rows(i).EntireRow.Delete
-        i = i - 1
-    End If
-Next
+ 'For i = 2 To LastRowSok
+ '   If wb.Worksheets("sheet").Cells(i, 13).Value = "Halott" Then
+ '       Rows(i).EntireRow.Delete
+ '       i = i - 1                                   'mikor kitorli a sort akkor visszakellugornia hogy  nehogy kihagyon egyet
+ '   End If
+ '   If wb.Worksheets("sheet").Cells(i, 14).Value = "10napon belüli" Then
+ '       Rows(i).EntireRow.Delete
+ '       i = i - 1
+ '   End If
+'Next
 
 Application.ScreenUpdating = True
 
@@ -144,3 +149,17 @@ Next
 
 
 End Sub
+
+Sub Elso()
+
+MsgBox "Alma"
+
+End Sub
+
+Sub Masodik()
+
+Elso
+
+
+End Sub
+
