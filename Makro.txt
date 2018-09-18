@@ -1,0 +1,146 @@
+Sub Elsolepes()
+
+''talán valamennyire gyorsít
+Application.ScreenUpdating = False
+
+
+''váltózok deklarálása nem feltétlen szükséges, de biztos ami biztos
+Dim LastRowSok As Integer: Dim LastRowKeves As Integer
+Dim MaiD As Date: Dim MaiDjo As Date
+Dim wb As Workbook
+
+''datum
+MaiD = Date
+MaiDjo = MaiD - 10
+
+''megnyitni a drms riportot és hogy automatikusan találja meg a sorok számát
+Set wb = Workbooks.Open("D:\BoldizsárÁdám\Munka\Dokumentumok\DRMS\makro\DRMS_20180910.xlsx")
+LastRowSok = wb.Worksheets("Sheet").Cells(wb.Worksheets("Sheet").Rows.Count, "A").End(xlUp).Row
+LastRowKeves = Worksheets("halott").Cells(Worksheets("halott").Rows.Count, "A").End(xlUp).Row
+LastRowKerdeses = Worksheets("kérdeses").Cells(Worksheets("kérdeses").Rows.Count, "A").End(xlUp).Row
+
+
+wb.Worksheets("Sheet").Cells(1, 10).Value = "Status"
+wb.Worksheets("Sheet").Cells(1, 11).Value = "TS megjegyzes"
+wb.Worksheets("Sheet").Cells(1, 12).Value = "CCD megjegyzes"
+wb.Worksheets("Sheet").Cells(1, 13).Value = "Halott-e"
+wb.Worksheets("Sheet").Cells(1, 14).Value = "'10napon belul-e"
+
+''halott vagy 10napon belüli gépek kitörlése
+For i = 2 To LastRowSok
+    For j = 2 To LastRowKeves
+        wb.Worksheets("Sheet").Cells(i, 9).NumberFormat = "yyyy/mm/dd"
+        If wb.Worksheets("Sheet").Cells(i, 2) = Worksheets("halott").Cells(j, 2) Then
+            wb.Worksheets("Sheet").Cells(i, 13).Value = "Halott"
+            Cells(i, 1).EntireRow.Interior.Color = RGB(255, 0, 0)
+        End If
+        If wb.Worksheets("Sheet").Cells(i, 9) > MaiDjo Then
+            wb.Worksheets("Sheet").Cells(i, 14).Value = "10napon belüli"
+            Cells(i, 1).EntireRow.Interior.Color = RGB(0, 57, 150)
+        End If
+    Next
+Next
+
+''kérdeses fülrõl megjegyzések,status,ts átadása
+For c = 2 To LastRowKerdeses
+        For v = 2 To LastRowSok
+           If Worksheets("kérdeses").Cells(c, 2) = wb.Worksheets("sheet").Cells(v, 2) Then
+                wb.Worksheets("Sheet").Cells(v, 10).Value = Worksheets("kérdeses").Cells(c, 11)             'status
+                'wb.Worksheets("Sheet").Cells(v, 12).Value = Worksheets("kérdeses").Cells(c, 14)             'CCD
+                'wb.Worksheets("Sheet").Cells(v, 11).Value = Worksheets("kérdeses").Cells(c, 12)             'TS
+                wb.Worksheets("Sheet").Cells(v, 11).Value = Worksheets("kérdeses").Cells(c, 14) & " " & Worksheets("kérdeses").Cells(c, 12)
+                Cells(v, 1).EntireRow.Interior.Color = RGB(255, 255, 0)
+            End If
+        Next
+Next
+
+''halott fül megjegyzések tartalmazza a ccd-t
+For i = 2 To LastRowKeves
+    If Not IsEmpty(Worksheets("halott").Cells(i, 9)) Then
+        For j = 2 To LastRowSok
+            wb.Worksheets("Sheet").Cells(j, 10).Value = Worksheets("halott").Cells(i, 8)                'status
+            If Worksheets("halott").Cells(i, 2) = wb.Worksheets("sheet").Cells(j, 2) Then
+                wb.Worksheets("Sheet").Cells(j, 11).Value = Worksheets("halott").Cells(i, 9)            'TS,komment
+                Cells(j, 1).EntireRow.Interior.Color = RGB(255, 0, 0)
+                Exit For
+            End If
+        Next
+    End If
+Next
+
+''Torolni a halott gépeket és a 10napon belülieket
+ For i = 2 To LastRowSok
+    If wb.Worksheets("sheet").Cells(i, 13).Value = "Halott" Then
+        Rows(i).EntireRow.Delete
+        i = i - 1                                   'mikor kitorli a sort akkor visszakellugornia hogy  nehogy kihagyon egyet
+    End If
+    If wb.Worksheets("sheet").Cells(i, 14).Value = "10napon belüli" Then
+        Rows(i).EntireRow.Delete
+        i = i - 1
+    End If
+Next
+
+Application.ScreenUpdating = True
+
+End Sub
+
+Sub Koviriport()
+
+
+Dim LastRowSok As Integer: Dim LastRowKeves As Integer
+Dim MaiD As Date: Dim MaiDjo As Date
+Dim wb As Workbook
+
+''datum
+MaiD = Date
+MaiDjo = MaiD - 10
+
+Set wb = Workbooks.Open("D:\BoldizsárÁdám\Munka\Dokumentumok\DRMS\makro\DRMS_20180910.xlsx")
+Set uj = Workbooks.Open("D:\BoldizsárÁdám\Munka\Dokumentumok\DRMS\makro\DRMS_20180913.xlsx")
+LastRowSok = wb.Worksheets("Sheet").Cells(wb.Worksheets("Sheet").Rows.Count, "A").End(xlUp).Row
+LastRowKeves = Worksheets("halott").Cells(Worksheets("halott").Rows.Count, "A").End(xlUp).Row
+LastRowKerdeses = Worksheets("kérdeses").Cells(Worksheets("kérdeses").Rows.Count, "A").End(xlUp).Row
+LastRowUj = uj.Worksheets("Sheet").Cells(uj.Worksheets("Sheet").Rows.Count, "A").End(xlUp).Row
+
+
+
+
+
+
+'datum atirasa az ujban
+'For i = 2 To LastRowUj
+'    wb.Worksheets("Sheet").Cells(i, 9).NumberFormat = "yyyy/mm/dd"
+'    Next
+
+'elõzöleg reportolt gepek kiszurése
+For i = 2 To LastRowUj
+    For j = 2 To LastRowSok
+        uj.Worksheets("Sheet").Cells(i, 9).NumberFormat = "yyyy/mm/dd"
+        If uj.Worksheets("Sheet").Cells(i, 2) = wb.Worksheets("sheet").Cells(j, 2) Then
+           uj.Worksheets("Sheet").Cells(i, 13).Value = "Elõzõ riportban benne volt"
+            Cells(i, 1).EntireRow.Interior.Color = RGB(255, 0, 255)
+        End If
+    Next
+Next
+
+''halott vagy 10napon belüli gépek kitörlése
+For i = 2 To LastRowUj
+    For j = 2 To LastRowKeves
+        'uj.Worksheets("Sheet").Cells(i, 9).NumberFormat = "yyyy/mm/dd"
+        If uj.Worksheets("Sheet").Cells(i, 2) = Worksheets("halott").Cells(j, 2) Then
+            uj.Worksheets("Sheet").Cells(i, 13).Value = "Halo"
+            Cells(i, 1).EntireRow.Interior.Color = RGB(255, 0, 0)
+        End If
+        If uj.Worksheets("Sheet").Cells(i, 9) > MaiDjo Then
+            uj.Worksheets("Sheet").Cells(i, 14).Value = "10napon belüli"
+            Cells(i, 1).EntireRow.Interior.Color = RGB(0, 57, 150)
+        End If
+    Next
+Next
+
+
+''function
+''function
+
+
+End Sub
